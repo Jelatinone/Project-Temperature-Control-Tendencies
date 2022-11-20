@@ -103,7 +103,7 @@ public class Weather
             FileReader.nextLine();
 
             //For Each Data Line
-            for(int i = 0; i <= File_Length; i++)
+            for(int i = 0; i < File_Length; i++)
             {
                 //Read in Line, Split by Comma, Get Value at Month
                 String Raw_MonthData = FileReader.nextLine().split(",")[Selected_Month];
@@ -124,12 +124,13 @@ public class Weather
             Arrays.sort(MonthData);
 
             //Add to Output File
-            for(int i = 0; i > MonthData.length;i++)
+            for (double monthDatum : MonthData)
             {
-                Output.println(MonthData[i]);
+                Output.println(monthDatum);
             }
             //Close File
             Output.close();
+
 
             //Part A
 
@@ -143,40 +144,84 @@ public class Weather
             //Read from Output file
             Scanner Output_FileReader = new Scanner(new File("Output.dat"));
 
-            //For each line not exceeding DeltaPoint
-            for(int i = 0; i > Delta_Point; i++)
+            //Reset File Length
+            File_Length = 0;
+
+            //Determine Data Length
+            while(Output_FileReader.hasNextLine())
+            {
+                Output_FileReader.nextLine();
+                File_Length++;
+            }
+            //Redefine Scanner
+            Output_FileReader = new Scanner(new File("Output.dat"));
+
+            //For each line
+            for(int i = 0; i < File_Length; i++)
             {
                 //Read Output Line
                 String Line = Output_FileReader.nextLine();
-                if(!(i > Delta_Point))
+
+                //Iterator greater than point or equivalent
+                if(i >= Delta_Point)
                 {
                     //Add to Array and Iterate
                     DeltaPoints[DeltaPoints_Position] = Double.parseDouble(Line);
                     DeltaPoints_Position++;
+
+                    //Break from Loop
+                    if(DeltaPoints_Position == 3)
+                    {
+                        break;
+                    }
                 }
             }
             //Sort Points
             Arrays.sort(DeltaPoints);
 
             //Output Change
+            System.out.print("\033[H\033[2J");
+            System.out.print("Part A:");
             System.out.println("(" + Arrays.toString(DeltaPoints) + ") Change: " + (DeltaPoints[2] - DeltaPoints[0]));
 
             //Part B
 
             //Restart Scanner
-            Output_FileReader.reset();
+            Output_FileReader = new Scanner(new File("Output.dat"));
 
             //Determine Data Length
             File_Length = 0;
-            while(Output_FileReader.hasNext())
+            while(Output_FileReader.hasNextLine())
             {
+                Output_FileReader.nextLine();
                 File_Length++;
             }
+            //Create array for Data
+            MonthData = new double[File_Length];
 
-            for(int i = 0; i <= File_Length;i++)
+            //Restart Scanner
+            Output_FileReader = new Scanner(new File("Output.dat"));
+
+            //Iterate through and collect data
+            for(int i = 0; i < File_Length; i++)
             {
-                System.out.println(i);
+                MonthData[i] = Double.parseDouble(Output_FileReader.nextLine());
             }
+            Arrays.sort(MonthData);
+
+            //Calculate Mean
+            double Mean = 0.0;
+            for(int i = 0; i <= MonthData.length-1;i++)
+            {
+                Mean += MonthData[i];
+            }
+            Mean /= MonthData.length-1;
+
+            //Output
+            System.out.println("Part B:");
+            System.out.println("Mean: " + Mean);
+            System.out.println("Median: " + MonthData[(int)(MonthData.length-1) /2]);
+            System.out.println("Mode: ");
 
             //Exit Prompt
             System.out.print("Would you like to Exit? : ");
