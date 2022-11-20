@@ -96,6 +96,12 @@ public class Weather
             //Create Data Array
             double[] MonthData = new double[File_Length];
 
+            //Redefine Scanner
+            FileReader = new Scanner(new File("C:\\Users\\Cody\\IdeaProjects\\Temperature Control Tendencies\\src\\temps.csv"));
+
+            //Discard Line One
+            FileReader.nextLine();
+
             //For Each Data Line
             for(int i = 0; i <= File_Length; i++)
             {
