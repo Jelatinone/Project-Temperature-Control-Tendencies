@@ -37,7 +37,7 @@ public class Weather
             //Input Prompt
 
             //Inner Setup
-            Scanner FileReader = new Scanner(new File("C:\\Users\\Cody\\IdeaProjects\\Temperature Control Tendencies\\src\\temps.csv"));
+            Scanner FileReader = new Scanner(new File("temps.csv"));
             PrintWriter Output = new PrintWriter(new FileWriter("Output.dat"));
             prompt_complete = false;
 
@@ -57,7 +57,7 @@ public class Weather
                 System.out.print("Enter a Month: ");
 
                 //Valid Input
-                if(InputStream.hasNextInt() && (Selected_Month = InputStream.nextInt()) <= 12)
+                if(InputStream.hasNextInt() && (Selected_Month = InputStream.nextInt()) <= 12 && Selected_Month > 0)
                 {
                     //Exit Prompt
                     prompt_complete = true;
@@ -72,7 +72,7 @@ public class Weather
                     //Wait Block
                     try
                     {
-                        Thread.sleep(15000);
+                        Thread.sleep(5000);
                     }
                     catch(InterruptedException e)
                     {
@@ -93,11 +93,11 @@ public class Weather
                 File_Length++;
             }
 
-            //Create Data Array
+            //Construct Double Array With Length of File
             double[] MonthData = new double[File_Length];
 
             //Redefine Scanner
-            FileReader = new Scanner(new File("C:\\Users\\Cody\\IdeaProjects\\Temperature Control Tendencies\\src\\temps.csv"));
+            FileReader = new Scanner(new File("temps.csv"));
 
             //Discard Line One
             FileReader.nextLine();
@@ -120,10 +120,41 @@ public class Weather
                     MonthData[i] = 0.0;
                 }
             }
-            //Sort Data Array
+            //Generate Random Delta Point
+            int Delta_Point = random.nextInt(File_Length-2);
+
+            //Construct Double Array With Length of 3
+            double[] Delta = new double[3];
+            int Delta_Position = 0;
+
+            //Iterate Double Array
+            for(int i = 0; i <= (Delta_Point+2);i++)
+            {
+                if(i >= Delta_Point)
+                {
+                    Delta[Delta_Position] = MonthData[i];
+                    Delta_Position++;
+                }
+            }
+            //Sort Points
+            Arrays.sort(Delta);
+
+            //Output Part A
+            System.out.print("\033[H\033[2J");
+            System.out.println("-----------------------");
+            System.out.println("Part A:");
+            System.out.println("[Random Delta]");
+            System.out.println("(" + Arrays.toString(Delta) + ") \nChange: " + (Delta[2] - Delta[0]));
+            System.out.println("-----------------------");
+            System.out.print("Enter Anything to Proceed: ");
+            InputStream.next();
+
+            //Part B
+
+            //Sort Month Data Array
             Arrays.sort(MonthData);
 
-            //Add to Output File
+            //Output to file
             for (double monthDatum : MonthData)
             {
                 Output.println(monthDatum);
@@ -131,100 +162,61 @@ public class Weather
             //Close File
             Output.close();
 
-
-            //Part A
-
-            //Generate Random Delta Point
-            int Delta_Point = random.nextInt(File_Length-2);
-
-            //Create Temporary Data Array
-            double[] DeltaPoints = new double[3];
-            int DeltaPoints_Position = 0;
-
-            //Read from Output file
-            Scanner Output_FileReader = new Scanner(new File("Output.dat"));
-
-            //Reset File Length
-            File_Length = 0;
-
-            //Determine Data Length
-            while(Output_FileReader.hasNextLine())
-            {
-                Output_FileReader.nextLine();
-                File_Length++;
-            }
-            //Redefine Scanner
-            Output_FileReader = new Scanner(new File("Output.dat"));
-
-            //For each line
-            for(int i = 0; i < File_Length; i++)
-            {
-                //Read Output Line
-                String Line = Output_FileReader.nextLine();
-
-                //Iterator greater than point or equivalent
-                if(i >= Delta_Point)
-                {
-                    //Add to Array and Iterate
-                    DeltaPoints[DeltaPoints_Position] = Double.parseDouble(Line);
-                    DeltaPoints_Position++;
-
-                    //Break from Loop
-                    if(DeltaPoints_Position == 3)
-                    {
-                        break;
-                    }
-                }
-            }
-            //Sort Points
-            Arrays.sort(DeltaPoints);
-
-            //Output Change
-            System.out.print("\033[H\033[2J");
-            System.out.print("Part A:");
-            System.out.println("(" + Arrays.toString(DeltaPoints) + ") Change: " + (DeltaPoints[2] - DeltaPoints[0]));
-
-            //Part B
-
-            //Restart Scanner
-            Output_FileReader = new Scanner(new File("Output.dat"));
-
-            //Determine Data Length
-            File_Length = 0;
-            while(Output_FileReader.hasNextLine())
-            {
-                Output_FileReader.nextLine();
-                File_Length++;
-            }
-            //Create array for Data
+            //Retrieve Data
             MonthData = new double[File_Length];
 
-            //Restart Scanner
-            Output_FileReader = new Scanner(new File("Output.dat"));
+            //Create Output.dat Scanner
+            Scanner Output_FileReader = new Scanner(new File("Output.dat"));
 
             //Iterate through and collect data
             for(int i = 0; i < File_Length; i++)
             {
                 MonthData[i] = Double.parseDouble(Output_FileReader.nextLine());
             }
-            Arrays.sort(MonthData);
+
+            //Math
 
             //Calculate Mean
             double Mean = 0.0;
-            for(int i = 0; i <= MonthData.length-1;i++)
-            {
-                Mean += MonthData[i];
+            for (double monthDatum : MonthData) {
+                Mean += monthDatum;
             }
             Mean /= MonthData.length-1;
 
-            //Output
+            //Calculate Median
+            double Median = MonthData[(MonthData.length-1) /2];
+
+            //Calculate Mode
+            double Mode = 0;
+            int Occurrences = 0;
+            for (double monthDatum : MonthData) {
+                //Reset Occurrences
+                int Local_Occurrences = 0;
+                for (double datum : MonthData) {
+                    if (datum == monthDatum) {
+                        Local_Occurrences++;
+                    }
+                }
+                //Check against Occurrences
+                if ((Local_Occurrences - 1) > Occurrences) {
+                    Mode = monthDatum;
+                }
+            }
+
+            //Output Part B
+            System.out.print("\033[H\033[2J");
+            System.out.println("-----------------------");
             System.out.println("Part B:");
             System.out.println("Mean: " + Mean);
-            System.out.println("Median: " + MonthData[(int)(MonthData.length-1) /2]);
-            System.out.println("Mode: ");
+            System.out.println("Median: " + Median);
+            System.out.println("Mode: " + Mode);
+            System.out.println("-----------------------");
+            System.out.print("Press Anything to Proceed: ");
+            InputStream.next();
 
             //Exit Prompt
-            System.out.print("Would you like to Exit? : ");
+            System.out.print("\033[H\033[2J");
+            System.out.print("Would you like to Exit?: ");
             char response = InputStream.next().charAt(0);
             if (response == 'Y' || response == 'y')
             {
@@ -232,7 +224,10 @@ public class Weather
             }
 
         }
-
+        //Exit Message
+        System.out.print("\033[H\033[2J");
+        System.out.println("Exiting...");
+        System.out.println("Credit : Cody Washington");
 
     }
 }
